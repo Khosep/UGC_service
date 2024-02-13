@@ -1,23 +1,26 @@
-# Сервис UGC
-# Сервис контента генерируемого пользователем в онлайн-кинотеатре
+# ASYNC_API_sprint_1
 
 # Адрес репозитория:
-https://github.com/Izrekatel/Auth_sprint_2
+https://github.com/mkosinov/Async_API_sprint_1
 
 # Авторы проекта:
-- Гельруд Борис (https://github.com/Izrekatel/)
-- Косянов Никита (https://github.com/4madeuz/)
-- Холкин Сергей (https://github.com/Khosep/)
+Гельруд Борис (https://github.com/Izrekatel/)
+Косинов Максим (https://github.com/mkosinov)
+Холкин Сергей (https://github.com/Khosep)
 
 ## Описание проекта:
-"Сервис авторизации онлайн-кинотеатра" взаимодействует с API кинотеатра и
-административной панелью Django. Настроена трассировка запросов в API сервиса
-авторизации, добавлена возможность регистрации и авторизации через соц. сети.
-Установлен лимит запросов к сервису.
+"ASYNC_API" - ассинхронный API для онлайн-кинотеатра учебного проекта
+Яндекс.Практикум, состоящий из двух сервисов:
+1. ETL сервис, который забирает данные по кинопроизведениям, жанрам и персонам
+из БД Postgres и индексирует их в Elasticsearch.
+2. API на Fastapi, которое получает данные из Elasticsearch и кэширует в
+Redis.
 Проект организован в docker-compose.
 
 ## Стек:
 - Python
+- PostgreSQL
+- Elasticsearch
 - Redis
 - Fastapi
 - Git
@@ -25,82 +28,31 @@ https://github.com/Izrekatel/Auth_sprint_2
 - Poetry
 - Pre-commit
 - Pydantic
+- Psycopg2-binary
 - Uvicorn
-- Pytest
-- aiohttp
-- nginx
-- sqlalchemy
-- alembic
-- jaeger
-- elasticsearch
-- swagger
-- postgres
-- redis
 
-### 1. Запуск основного проекта в контейнерах Docker
+### 1. Запуск проекта в контейнерах Docker
 
 #### 1. Создать .env файл из env.example (в корневой папке)
 
 #### 2. Запустить Docker
 
-#### 3. Поднимаем сеть контейнеров:
-```bash
-docker-compose -f docker-compose-movies.yml -f docker-compose-django.yml -f docker-compose-auth.yml up -d
-```
-```
-При первом запуске postgres-movies надо зайти в контейер и выполнить команду
-psql -U app -d movies_database -f /docker-entrypoint-initdb.d/create_schema.ddl
-```
-
-#### 4. Просмотр основного проекта
-
-```
-Документация сервиса авторизациидоступна по адресу:
-http://localhost:90/auth/openapi#/
-
-Также можно ее скачать в виде json:
-http://localhost:90/auth/openapi.json
-
-```
-
-```
-Документация сервиса movies по адресу:
-http://localhost:70/api/openapi#/
-
-Также можно ее скачать в виде json:
-http://localhost:70/api/openapi.json
-
-```
-
-```
-Административная панель DJANGO:
-http://localhost/admin/
-
-```
-
-
-### 2. Запуск тестов в контейнерах Docker
-
-#### 1. Создать .env файл из env.example
-
-#### 2. Запустить Docker
-
 #### 3. Поднимаем контейнеры:
+```bash
+docker-compose up -d --build
 ```
-Запуск тестов AUTH-сервиса
-docker compose -f docker-compose-auth-tests.yml up -d
+#### 4. Локальные адреса проекта:
 ```
+Адрес API
 ```
-Запуск тестов MOVIES-сервиса
-docker compose -f docker-compose-movies-test.yml up -d
+http://127.0.0.1/api/v1/
+```
+Документация API
+```
+http://127.0.0.1/api/openapi/
 ```
 
-#### 4. Результат:
-```
-После прохождения тестов результат можно посмотреть к логах контейнера тестов.
-```
-
-### 3. Установка для локальной разработки
+### 2. Установка для локальной разработки
 
 1. Установите Poetry
 
@@ -151,7 +103,7 @@ poetry env use python3.11
 
 Перейти в одну из папок сервиса, например:
 ```bash
-cd tests
+cd bot
 ```
 
 Установка зависимостей (для разработки)
@@ -197,3 +149,88 @@ pre-commit install --all
 ```
 
 В дальнейшем при выполнении команды `git commit` будут выполняться проверки перечисленные в файле `.pre-commit-config.yaml`.
+
+
+5. Запуск backend сервера Fastapi (после запуска всего проекта в контейнерах Docker)
+
+#### 1. Изменить значение ES_HOST на "localhost" в .env
+
+#### 2. Войти в папку fastapi
+```bash
+cd fastapi
+```
+#### 3. Войти в оболочку виртуального окружения poetry
+```bash
+poetry shell
+```
+
+#### 4. Запустить локальный backend сервер fastapi
+```poetry
+python main.py
+```
+#### 5. Адреса API локального backend сервера fastapi
+
+Локальные адреса проекта:
+
+Адрес API
+```
+http://127.0.0.1:8000/api/v1/
+```
+Документация API
+```
+http://127.0.0.1:8000/api/openapi/
+```
+
+### Примеры запросов API:
+
+* http://127.0.0.1/api/v1/films?sort=-imdb_rating&page_size=50&page_number=1
+
+Пример ответа:
+```
+{
+  "uuid": "uuid",
+  "title": "str",
+  "imdb_rating": "float"
+},
+...
+[
+{
+  "uuid": "524e4331-e14b-24d3-a156-426614174003",
+  "title": "Ringo Rocket Star and His Song for Yuri Gagarin",
+  "imdb_rating": 9.4
+},
+{
+  "uuid": "524e4331-e14b-24d3-a156-426614174003",
+  "title": "Lunar: The Silver Star",
+  "imdb_rating": 9.2
+},
+...
+]
+```
+* http://127.0.0.1/api/v1/genres/
+
+Пример ответа:
+```
+[
+{
+  "uuid": "uuid",
+  "name": "str",
+  ...
+},
+...
+]
+
+[
+{
+  "uuid": "d007f2f8-4d45-4902-8ee0-067bae469161",
+  "name": "Adventure",
+  ...
+},
+{
+  "uuid": "dc07f2f8-4d45-4902-8ee0-067bae469164",
+  "name": "Fantasy",
+  ...
+},
+...
+]
+```
