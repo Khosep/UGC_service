@@ -1,4 +1,4 @@
-name: sprint8_ugc
+name: sprint8_kafka
 version: '3.9'
 
 services:
