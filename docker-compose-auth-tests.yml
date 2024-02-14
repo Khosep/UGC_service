@@ -1,0 +1,89 @@
+name: tests-auth
+version: '3.9'
+
+services:
+  postgres-auth-test:
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=$AUTH_TEST_POSTGRES_HOST
+      - POSTGRES_PORT=$AUTH_TEST_POSTGRES_PORT
+      - POSTGRES_DB=$AUTH_TEST_POSTGRES_DB
+      - POSTGRES_USER=$AUTH_TEST_POSTGRES_USER
+      - POSTGRES_PASSWORD=$AUTH_TEST_POSTGRES_PASSWORD
+      - PGPORT=$AUTH_TEST_POSTGRES_PORT
+    container_name: $AUTH_TEST_POSTGRES_HOST
+    image: postgres:16.0-alpine3.18
+    expose:
+      - $AUTH_TEST_POSTGRES_PORT
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -p $AUTH_TEST_POSTGRES_PORT -U $AUTH_TEST_POSTGRES_USER -d $AUTH_TEST_POSTGRES_DB"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    restart: "no"
+
+
+  redis-auth-test:
+    env_file:
+      - .env
+    container_name: $AUTH_TEST_REDIS_HOST
+    image: redis:7.2.3-alpine3.19
+    expose:
+      - $AUTH_TEST_REDIS_PORT
+    restart: "no"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli", "-p $AUTH_TEST_REDIS_PORT", "ping"]
+      interval: 10s
+      timeout: 1s
+      retries: 3
+    command: redis-server --port $AUTH_TEST_REDIS_PORT --save 60 1 --loglevel notice
+
+  fastapi-auth-test:
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=$AUTH_TEST_POSTGRES_HOST
+      - POSTGRES_PORT=$AUTH_TEST_POSTGRES_PORT
+      - POSTGRES_DB=$AUTH_TEST_POSTGRES_DB
+      - POSTGRES_USER=$AUTH_TEST_POSTGRES_USER
+      - POSTGRES_PASSWORD=$AUTH_TEST_POSTGRES_PASSWORD
+      - AUTH_REDIS_HOST=$AUTH_TEST_REDIS_HOST
+      - AUTH_REDIS_PORT=$AUTH_TEST_REDIS_PORT
+      - AUTH_FASTAPI_HOST=$AUTH_TEST_FASTAPI_HOST
+      - AUTH_FASTAPI_PORT=$AUTH_TEST_FASTAPI_PORT
+    container_name: $AUTH_TEST_FASTAPI_HOST
+    build:
+      context: ./auth-service/fastapi-auth
+    image: $AUTH_FASTAPI_HOST
+    volumes:
+      - fastapi_auth_test_log:/auth-service/logs
+    ports:
+      - $AUTH_TEST_FASTAPI_PORT:$AUTH_TEST_FASTAPI_PORT
+    depends_on:
+      postgres-auth-test:
+        condition: service_healthy
+      redis-auth-test:
+        condition: service_healthy
+    restart: "no"
+    healthcheck:
+      test: curl -s -f http://localhost:$AUTH_TEST_FASTAPI_PORT/auth/openapi || exit 1
+      interval: 10s
+      timeout: 1s
+      retries: 10
+
+  auth-tests:
+    env_file:
+      - .env
+    container_name: auth-tests
+    build:
+      context: ./auth-service/tests-auth
+    image: tests_auth_img
+    depends_on:
+       fastapi-auth-test:
+        condition: service_healthy
+    command: poetry run pytest
+
+volumes:
+  fastapi_auth_test_log:

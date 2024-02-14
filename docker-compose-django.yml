@@ -1,0 +1,52 @@
+version: '3.9'
+
+services:
+  django-admin-panel:
+    container_name: django-admin-panel
+    env_file:
+      - .env
+    environment:
+      - PGPASSWORD=$DJANGO_POSTGRES_PASSWORD
+      - POSTGRES_NAME=$DJANGO_POSTGRES_HOST
+      - POSTGRES_USER=$DJANGO_POSTGRES_USER
+      - POSTGRES_DB=$DJANGO_POSTGRES_DB
+    build: ./django/app
+    restart: always
+    volumes:
+      - static_value:/app/static/
+      - media_value:/app/media/
+
+  swagger:
+    env_file:
+      - .env
+    image: swaggerapi/swagger-ui
+    restart: always
+    volumes:
+      - ./django/docs/openapi.yaml:/openapi.yaml
+    environment:
+      SWAGGER_JSON: /django/openapi.yaml
+    depends_on:
+      - django-admin-panel
+    ports:
+      - $DJANGO_SWAGGER_PORT:$DJANGO_SWAGGER_PORT
+
+  nginx-django:
+    container_name: nginx-django
+    image: nginx:1.25-bookworm
+    ports:
+      - 80:80
+    volumes:
+      - ./django/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./django/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_value:/var/html/static/
+      - media_value:/var/html/media/
+    restart: always
+
+networks:
+  my_network:
+    driver: bridge
+
+volumes:
+  nginx_django_log:
+  static_value:
+  media_value:

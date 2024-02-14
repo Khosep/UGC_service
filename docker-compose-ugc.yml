@@ -1,0 +1,92 @@
+name: sprint8_ugc
+version: '3.9'
+
+services:
+  postgres-ugc:
+    container_name: $UGC_POSTGRES_HOST
+    image: postgres:16.0-alpine3.18
+    env_file:
+      - .env
+    environment:
+      - PGPORT=$UGC_POSTGRES_PORT
+      - POSTGRES_HOST=$UGC_POSTGRES_HOST
+      - POSTGRES_PORT=$UGC_POSTGRES_PORT
+      - POSTGRES_DB=$UGC_POSTGRES_DB
+      - POSTGRES_USER=$UGC_POSTGRES_USER
+      - POSTGRES_PASSWORD=$UGC_POSTGRES_PASSWORD
+    expose:
+      - $UGC_POSTGRES_PORT
+    volumes:
+      - postgres_ugc_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -p $UGC_POSTGRES_PORT -U $UGC_POSTGRES_USER -d $UGC_POSTGRES_DB"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    restart: always
+
+  redis-ugc:
+    container_name: $UGC_REDIS_HOST
+    image: redis:7.2.3-alpine3.19
+    expose:
+      -  $UGC_REDIS_PORT
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli", "-p $UGC_REDIS_PORT", "ping"]
+      interval: 10s
+      timeout: 1s
+      retries: 3
+    volumes:
+      - redis_ugc_data:/data
+    restart: always
+    command: redis-server --port $UGC_REDIS_PORT --save 60 1 --loglevel notice
+
+  fastapi-ugc:
+    environment:
+      - POSTGRES_HOST=$UGC_POSTGRES_HOST
+      - POSTGRES_PORT=$UGC_POSTGRES_PORT
+      - POSTGRES_DB=$UGC_POSTGRES_DB
+      - POSTGRES_USER=$UGC_POSTGRES_USER
+      - POSTGRES_PASSWORD=$UGC_POSTGRES_PASSWORD
+    container_name: $UGC_FASTAPI_HOST
+    build:
+      context: ./ugc-service/fastapi-ugc
+    image: $UGC_FASTAPI_HOST
+    env_file:
+      - .env
+    expose:
+      - $UGC_FASTAPI_PORT
+    volumes:
+      - fastapi_ugc_log:/ugc-service/logs
+    healthcheck:
+      test: curl -s -f http://localhost:$UGC_FASTAPI_PORT/ugc/openapi || exit 1
+      interval: 10s
+      timeout: 1s
+      retries: 3
+    restart: always
+
+  nginx-ugc:
+    container_name: nginx-ugc
+    image: nginx:1.25-bookworm
+    ports:
+      - 60:80
+    volumes:
+      - nginx_ugc_log:/var/log/nginx
+      - ./ugc-service/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ugc-service/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/timezone:/etc/timezone:ro
+    depends_on:
+      fastapi-ugc:
+        condition: service_healthy
+    restart: always
+
+networks:
+  my_network:
+    driver: bridge
+
+volumes:
+  postgres_ugc_data:
+  redis_ugc_data:
+  fastapi_ugc_log:
+  nginx_ugc_log:
+  kafka_0_data:
