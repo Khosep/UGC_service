@@ -1,4 +1,4 @@
-from pydantic import Field
+from pydantic import Field, ConfigDict
 
 from schemas.mixins import (
     CreatedMixinSchema,
@@ -12,5 +12,5 @@ class ReviewInDBCreate(UserIdFilmIdMixinSchema):
     score: int = Field(1, ge=1, le=10)
 
 
-class RevieInDBFull(IdMixinSchema, CreatedMixinSchema, ReviewInDBCreate):
-    pass
+class ReviewInDBFull(IdMixinSchema, CreatedMixinSchema, ReviewInDBCreate):
+    model_config = ConfigDict(from_attributes=True)

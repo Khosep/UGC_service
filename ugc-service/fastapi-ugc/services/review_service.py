@@ -1,3 +1,4 @@
+from datetime import datetime
 from functools import lru_cache
 from typing import Type
 
@@ -11,7 +12,7 @@ from core.exceptions import (
 )
 from models.common import FilmReview
 from schemas.mixins import UserIdFilmIdMixinSchema
-from schemas.review_schema import ReviewInDBCreate, RevieInDBFull
+from schemas.review_schema import ReviewInDBCreate, ReviewInDBFull
 from services.db_service import DBService, SQLAlchemyDBService
 
 
@@ -23,9 +24,9 @@ class ReviewService:
     def __init__(self, db_service: Type[DBService]):
         self.db_service = db_service()
 
-    async def create_review_in_db(
+    async def create(
         self, db: AsyncSession, review_data: ReviewInDBCreate
-    ) -> RevieInDBFull:
+    ) -> ReviewInDBFull:
         """Ревью фильму от пользователя в БД."""
         try:
             new_review = await self.db_service.create(
@@ -35,9 +36,9 @@ class ReviewService:
         except IntegrityError as exc:
             raise ReviewAlreadyExistException() from exc
 
-    async def get_review_from_db(
+    async def get(
         self, db: AsyncSession, review_data: UserIdFilmIdMixinSchema
-    ) -> RevieInDBFull:
+    ) -> ReviewInDBFull:
         """Получить ревью из БД."""
         stmt = select(FilmReview).where(
             FilmReview.user_id == review_data.user_id,
@@ -49,11 +50,34 @@ class ReviewService:
             raise ReviewANotFoundException
         return review
 
-    async def delete_review_from_db(
+    async def update(
+        self, db: AsyncSession, review_data: ReviewInDBCreate
+    ) -> ReviewInDBFull:
+        """Обновить ревью в БД."""
+        look_for_review = UserIdFilmIdMixinSchema(
+            user_id=review_data.user_id, film_id=review_data.film_id
+        )
+        review = await self.get(db=db, review_data=look_for_review)
+        modified_at = datetime.utcnow()
+        obj_in = ReviewInDBFull(
+            id=review.id,
+            user_id=review_data.user_id,
+            film_id=review_data.film_id,
+            review=review_data.review,
+            score=review_data.score,
+            created_at=review.created_at,
+            modified_at=modified_at,
+        )
+        result = await self.db_service.update(
+            db=db, db_obj=review, obj_in=obj_in
+        )
+        return result
+
+    async def delete(
         self, db: AsyncSession, review_data: UserIdFilmIdMixinSchema
     ) -> None:
-        """Получить ревью из БД."""
-        review = await self.get_review_from_db(db=db, review_data=review_data)
+        """Удалить ревью из БД."""
+        review = await self.get(db=db, review_data=review_data)
         await self.db_service.delete(db=db, obj=review)
 
 

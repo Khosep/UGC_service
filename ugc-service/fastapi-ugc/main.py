@@ -12,7 +12,7 @@ from redis.asyncio import Redis
 from starlette.middleware.base import _StreamingResponse
 from starlette.middleware.sessions import SessionMiddleware
 
-from api.v1 import like
+from api.v1 import like, review
 from core.config import settings
 from core.logger import logger
 from core.rate_limit import apply_rate_limit
@@ -54,6 +54,10 @@ app = FastAPI(
 
 app.include_router(
     like.router, prefix=settings.prefix + "/like", tags=["Лайки"]
+)
+
+app.include_router(
+    review.router, prefix=settings.prefix + "/review", tags=["Отзывы"]
 )
 
 app.add_middleware(

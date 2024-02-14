@@ -2,8 +2,7 @@ from fastapi import HTTPException, status
 
 
 class LikeAlreadyExistException(HTTPException):
-    def __init__(self, email):
-        self.email = email
+    def __init__(self):
         super().__init__(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Вы уже поставили лайк этому фильму ранее.",
@@ -19,8 +18,7 @@ class TooManyRequestsException(HTTPException):
 
 
 class ReviewAlreadyExistException(HTTPException):
-    def __init__(self, email):
-        self.email = email
+    def __init__(self):
         super().__init__(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Вы уже оставили отзыв к этому фильму ранее.",
