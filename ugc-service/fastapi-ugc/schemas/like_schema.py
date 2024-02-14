@@ -1,12 +1,11 @@
-from uuid import UUID
+from schemas.mixins import (
+    CreatedMixinSchema,
+    IdMixinSchema,
+    UserIdFilmIdMixinSchema,
+)
 
-from pydantic import BaseModel
-from schemas.mixins import CreatedMixinSchema, IdMixinSchema
 
-
-class LikeInDBCreate(BaseModel):
-    user_id: UUID
-    film_id: UUID
+class LikeInDBCreate(UserIdFilmIdMixinSchema):
     like: bool
 
 
