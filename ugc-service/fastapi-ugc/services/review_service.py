@@ -12,7 +12,7 @@ from core.exceptions import (
 )
 from models.common import FilmReview
 from schemas.mixins import IdMixinSchema, UserIdFilmIdMixinSchema
-from schemas.review_schema import ReviewInDBCreate, ReviewInDBFull
+from schemas.review_schema import ReviewInDBCreate, ReviewInDBFull, ReviewInDBUpdate
 from services.db_service import DBService, SQLAlchemyDBService
 
 
@@ -51,9 +51,10 @@ class ReviewService:
         return review
 
     async def update(
-        self, db: AsyncSession, review_data: ReviewInDBCreate
+        self, db: AsyncSession, review_data: ReviewInDBUpdate
     ) -> ReviewInDBFull:
         """Обновить ревью в БД."""
+        
         look_for_review = UserIdFilmIdMixinSchema(
             user_id=review_data.user_id, film_id=review_data.film_id
         )
@@ -63,8 +64,8 @@ class ReviewService:
             id=review.id,
             user_id=review_data.user_id,
             film_id=review_data.film_id,
-            review=review_data.review,
-            score=review_data.score,
+            review=review_data.review or review.review,
+            score=review_data.score or review.score,
             created_at=review.created_at,
             modified_at=modified_at,
         )

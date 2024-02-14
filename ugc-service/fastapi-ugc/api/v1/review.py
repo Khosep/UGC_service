@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.postgres import get_session
 from schemas.mixins import UserIdFilmIdMixinSchema
-from schemas.review_schema import ReviewInDBCreate, ReviewInDBFull
+from schemas.review_schema import ReviewInDBCreate, ReviewInDBFull, ReviewInDBUpdate
 from services.review_service import ReviewService, get_review_service
 
 
@@ -54,7 +54,7 @@ async def get_review(
 async def update_review(
     db: Annotated[AsyncSession, Depends(get_session)],
     review_service: Annotated[ReviewService, Depends(get_review_service)],
-    review_data: ReviewInDBCreate,
+    review_data: ReviewInDBUpdate,
 ) -> ReviewInDBFull:
     """Обновить отзыв пользователя о фильме."""
     result = await review_service.update(db=db, review_data=review_data)

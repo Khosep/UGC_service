@@ -12,5 +12,10 @@ class ReviewInDBCreate(UserIdFilmIdMixinSchema):
     score: int = Field(1, ge=1, le=10)
 
 
+class ReviewInDBUpdate(UserIdFilmIdMixinSchema):
+    review: str | None = None
+    score: int | None = Field(None, ge=1, le=10)
+
+
 class ReviewInDBFull(IdMixinSchema, CreatedMixinSchema, ReviewInDBCreate):
     model_config = ConfigDict(from_attributes=True)
