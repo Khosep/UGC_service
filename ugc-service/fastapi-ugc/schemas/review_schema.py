@@ -1,4 +1,4 @@
-from pydantic import Field, ConfigDict
+from pydantic import Field
 
 from schemas.mixins import (
     CreatedMixinSchema,
@@ -18,4 +18,4 @@ class ReviewInDBUpdate(UserIdFilmIdMixinSchema):
 
 
 class ReviewInDBFull(IdMixinSchema, CreatedMixinSchema, ReviewInDBCreate):
-    model_config = ConfigDict(from_attributes=True)
+    pass
