@@ -2,8 +2,8 @@
 .vscode/
 .DS_Store
 .nogit
-docker-compose.override.yml
-
+docker-compose-auth.override.yml
+docker-compose-ugc.override.yml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

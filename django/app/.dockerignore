@@ -1,0 +1,16 @@
+# Environments
+.venv
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Poetry files
+poetry.lock
+pyproject.toml
+
+# README file
+README.md
+
+# env.example file
+env.example
+.env
