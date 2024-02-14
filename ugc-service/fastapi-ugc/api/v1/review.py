@@ -63,7 +63,6 @@ async def update_review(
 
 @router.delete(
     "/review",
-    response_model=ReviewInDBFull,
     status_code=HTTPStatus.OK,
     description="Удалить отзыв пользователя на фильм.",
 )

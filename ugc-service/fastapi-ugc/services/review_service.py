@@ -11,7 +11,7 @@ from core.exceptions import (
     ReviewANotFoundException,
 )
 from models.common import FilmReview
-from schemas.mixins import UserIdFilmIdMixinSchema
+from schemas.mixins import IdMixinSchema, UserIdFilmIdMixinSchema
 from schemas.review_schema import ReviewInDBCreate, ReviewInDBFull
 from services.db_service import DBService, SQLAlchemyDBService
 
@@ -78,7 +78,8 @@ class ReviewService:
     ) -> None:
         """Удалить ревью из БД."""
         review = await self.get(db=db, review_data=review_data)
-        await self.db_service.delete(db=db, obj=review)
+        review_id = IdMixinSchema(id=review.id)
+        await self.db_service.delete(db=db, obj=review_id)
 
 
 @lru_cache()
