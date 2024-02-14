@@ -13,7 +13,7 @@ database Kafka
 
 Client -down-> MoviesService: Запрос пользователя на сайте/приложении
 MoviesService <-left-> AuthService: Получение токена пользователя
-MoviesService <-down-> FastapiUGC: Токен, запрос.
+MoviesService <-down-> FastapiUGC: Запрос.
 FastapiUGC -> PostgresUGC: CRUD действие согласно запроса
 FastapiUGC <-down-> Redis: Запись/чтение состояний.
 FastapiUGC <-down-> Cassandra: Пока не понятно
