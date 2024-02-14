@@ -23,8 +23,3 @@ class TimestampMixin:
         onupdate=datetime.utcnow,
         nullable=False,
     )
-
-
-class UserIdFilmIdMixin:
-    user_id = Column(UUID(as_uuid=True), nullable=False)
-    film_id = Column(UUID(as_uuid=True), nullable=False)
