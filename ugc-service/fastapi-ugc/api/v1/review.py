@@ -6,7 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.postgres import get_session
 from schemas.mixins import UserIdFilmIdMixinSchema
-from schemas.review_schema import ReviewInDBCreate, ReviewInDBFull, ReviewInDBUpdate
+from schemas.review_schema import (
+    ReviewInDBCreate,
+    ReviewInDBFull,
+    ReviewInDBUpdate,
+)
 from services.review_service import ReviewService, get_review_service
 
 

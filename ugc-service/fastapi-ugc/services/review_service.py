@@ -12,7 +12,11 @@ from core.exceptions import (
 )
 from models.common import FilmReview
 from schemas.mixins import IdMixinSchema, UserIdFilmIdMixinSchema
-from schemas.review_schema import ReviewInDBCreate, ReviewInDBFull, ReviewInDBUpdate
+from schemas.review_schema import (
+    ReviewInDBCreate,
+    ReviewInDBFull,
+    ReviewInDBUpdate,
+)
 from services.db_service import DBService, SQLAlchemyDBService
 
 
@@ -54,7 +58,7 @@ class ReviewService:
         self, db: AsyncSession, review_data: ReviewInDBUpdate
     ) -> ReviewInDBFull:
         """Обновить ревью в БД."""
-        
+
         look_for_review = UserIdFilmIdMixinSchema(
             user_id=review_data.user_id, film_id=review_data.film_id
         )
