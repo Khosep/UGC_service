@@ -1,24 +1,20 @@
 @startuml
 skinparam componentStyle uml2
-component AuthService
-component MoviesService
+component FrontendDada
 actor User as Client
 component FastapiUGC
 component Openapi
-component DjangoAdminPanel
-database PostgresUGC
+component ETL
 database Redis
-database Cassandra
+database Clickhouse
 database Kafka
 
-Client -down-> MoviesService: Запрос пользователя на сайте/приложении
-MoviesService <-left-> AuthService: Получение токена пользователя
-MoviesService <-down-> FastapiUGC: Запрос.
-FastapiUGC -> PostgresUGC: CRUD действие согласно запроса
-FastapiUGC <-down-> Cassandra: Пока не понятно
-FastapiUGC <-down-> Kafka: Запись/чтение действий пользователя
-FastapiUGC <-down-> Redis: Запись/чтение состояний.
-
-DjangoAdminPanel -down-> PostgresUGC: CRUD
-Openapi -right-> FastapiUGC: Документация API
+Client -down-> FrontendDada: Запрос пользователя на сайте/приложении
+FrontendDada <-down-> FastapiUGC: Запрос.
+FastapiUGC <-right-> Kafka: Запись/чтение действий пользователя
+FastapiUGC <-down-> Redis: Кэш последних запросов
+Kafka <-down-> ETL: Ивлечение существенных данных
+ETL -left-> Clickhouse: Запись существенных данных
+FastapiUGC <-down-> Clickhouse: Получение существенных данных
+Openapi <-right-> FastapiUGC: Документация API
 @enduml
