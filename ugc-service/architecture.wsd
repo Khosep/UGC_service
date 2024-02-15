@@ -5,16 +5,13 @@ actor User as Client
 component FastapiUGC
 component Openapi
 component ETL
-database Redis
 database Clickhouse
 database Kafka
 
 Client -down-> FrontendData: Запрос пользователя на сайте/приложении
-FrontendData <-down-> FastapiUGC: Запрос.
-FastapiUGC <-right-> Kafka: Запись/чтение действий пользователя
-FastapiUGC <-down-> Redis: Кэш последних запросов
+FrontendData -down-> FastapiUGC: данные.
+FastapiUGC -right-> Kafka: Запись действий пользователя
 Kafka <-down-> ETL: Ивлечение существенных данных
 ETL -left-> Clickhouse: Запись существенных данных
-FastapiUGC <-down-> Clickhouse: Получение существенных данных
 Openapi <-right-> FastapiUGC: Документация API
 @enduml
