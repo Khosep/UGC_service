@@ -15,9 +15,9 @@ Client -down-> MoviesService: Запрос пользователя на сай�
 MoviesService <-left-> AuthService: Получение токена пользователя
 MoviesService <-down-> FastapiUGC: Запрос.
 FastapiUGC -> PostgresUGC: CRUD действие согласно запроса
-FastapiUGC <-down-> Redis: Запись/чтение состояний.
 FastapiUGC <-down-> Cassandra: Пока не понятно
-FastapiUGC <-down-> Kafka: Запись/чтение историй просмотров
+FastapiUGC <-down-> Kafka: Запись/чтение действий пользователя
+FastapiUGC <-down-> Redis: Запись/чтение состояний.
 
 DjangoAdminPanel -down-> PostgresUGC: CRUD
 Openapi -right-> FastapiUGC: Документация API
