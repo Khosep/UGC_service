@@ -1,6 +1,6 @@
 @startuml
 skinparam componentStyle uml2
-component FrontendDada
+component FrontendData
 actor User as Client
 component FastapiUGC
 component Openapi
@@ -9,8 +9,8 @@ database Redis
 database Clickhouse
 database Kafka
 
-Client -down-> FrontendDada: Запрос пользователя на сайте/приложении
-FrontendDada <-down-> FastapiUGC: Запрос.
+Client -down-> FrontendData: Запрос пользователя на сайте/приложении
+FrontendData <-down-> FastapiUGC: Запрос.
 FastapiUGC <-right-> Kafka: Запись/чтение действий пользователя
 FastapiUGC <-down-> Redis: Кэш последних запросов
 Kafka <-down-> ETL: Ивлечение существенных данных
