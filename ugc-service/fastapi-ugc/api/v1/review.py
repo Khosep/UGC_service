@@ -76,7 +76,7 @@ async def create_review(
     db: Annotated[AsyncSession, Depends(get_session)],
     review_data: ReviewInDBCreate,
 ) -> ReviewInDBFull:
-    """Пользователь ставит лайк фильму."""
+    """Пользователь публикует отзыв к фильму."""
     new_review = await review_service.create(db=db, review_data=review_data)
     return new_review
 
