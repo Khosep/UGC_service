@@ -9,6 +9,7 @@ from sqlalchemy.future import select
 from core.exceptions import (
     ReviewAlreadyExistException,
     ReviewANotFoundException,
+    ReviewIdentificatorNotExistException,
 )
 from models.common import FilmReview
 from schemas.mixins import IdMixinSchema, UserIdFilmIdMixinSchema
@@ -16,6 +17,7 @@ from schemas.review_schema import (
     ReviewInDBCreate,
     ReviewInDBFull,
     ReviewInDBUpdate,
+    ReviewListFind,
 )
 from services.db_service import DBService, SQLAlchemyDBService
 
@@ -53,6 +55,32 @@ class ReviewService:
         if not review:
             raise ReviewANotFoundException
         return review
+
+    async def get_list(
+        self,
+        db: AsyncSession,
+        review_data: ReviewListFind,
+        page_number: int,
+        page_size: int,
+    ) -> list[ReviewInDBFull]:
+        """Получить список ревью из БД."""
+        if review_data.user_id is None and review_data.film_id is None:
+            raise ReviewIdentificatorNotExistException
+        offset = (page_number - 1) * page_size
+        stmt = select(FilmReview).where(
+            (review_data.score_from - 1 < FilmReview.score)
+            & (FilmReview.score < review_data.score_before + 1)
+        )
+        # Проверяем наличие user_id и film_id и добавляем условия
+        if review_data.user_id is not None:
+            stmt = stmt.where(FilmReview.user_id == review_data.user_id)
+        if review_data.film_id is not None:
+            stmt = stmt.where(FilmReview.film_id == review_data.film_id)
+        # Добавляем пагинатор
+        stmt = stmt.offset(offset).limit(page_size)
+        result = await self.db_service.execute(db=db, stmt=stmt)
+        review_list = result.scalars().all()
+        return review_list
 
     async def update(
         self, db: AsyncSession, review_data: ReviewInDBUpdate

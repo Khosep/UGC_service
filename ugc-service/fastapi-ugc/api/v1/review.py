@@ -1,15 +1,17 @@
 from http import HTTPStatus
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.config import settings
 from db.postgres import get_session
 from schemas.mixins import UserIdFilmIdMixinSchema
 from schemas.review_schema import (
     ReviewInDBCreate,
     ReviewInDBFull,
     ReviewInDBUpdate,
+    ReviewListFind,
 )
 from services.review_service import ReviewService, get_review_service
 
@@ -47,6 +49,36 @@ async def get_review(
     """Получить отзыв пользователя на фильм из БД."""
     review = await review_service.get(db=db, review_data=review_data)
     return review
+
+
+@router.post(
+    "/review/show_list",
+    response_model=list[ReviewInDBFull],
+    status_code=HTTPStatus.OK,
+    description="Получить отзывы по фильму/ отзывы пользователя на фильм.",
+)
+async def get_review_list(
+    review_service: Annotated[ReviewService, Depends(get_review_service)],
+    db: Annotated[AsyncSession, Depends(get_session)],
+    review_data: ReviewListFind,
+    page_number: int = Query(1, description="Номер страницы", ge=1),
+    page_size: int = Query(
+        settings.standart_page_size, description="Элементов на странице", ge=1
+    ),
+) -> list[ReviewInDBFull]:
+    """
+    Получить отзывы по фильму/ отзывы пользователя на фильм из БД.
+
+    :param page_number: Номер страницы (начиная с 1).
+    :param page_size: Количество элементов на странице.
+    """
+    review_list = await review_service.get_list(
+        db=db,
+        review_data=review_data,
+        page_number=page_number,
+        page_size=page_size,
+    )
+    return review_list
 
 
 @router.patch(

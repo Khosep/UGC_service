@@ -31,3 +31,11 @@ class ReviewANotFoundException(HTTPException):
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Отзыв не найден",
         )
+
+
+class ReviewIdentificatorNotExistException(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Предоставьте ID фильма и/или ID пользователя.",
+        )
