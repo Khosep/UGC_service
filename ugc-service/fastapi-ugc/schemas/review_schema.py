@@ -11,7 +11,7 @@ from schemas.mixins import (
 
 class ReviewInDBCreate(UserIdFilmIdMixinSchema):
     review: str
-    score: int = Field(1, ge=1, le=10)
+    score: int = Field(None, ge=1, le=10)
 
 
 class ReviewInDBUpdate(UserIdFilmIdMixinSchema):

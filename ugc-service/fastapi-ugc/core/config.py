@@ -45,6 +45,8 @@ class Settings(BaseSettings):
 
     session_cookie: str = "your_session_cookie"
 
+    enable_tracer: bool = Field(default=True)
+
     @property
     def dsn(self) -> PostgresDsn:
         return str(

@@ -10,6 +10,7 @@ from core.exceptions import (
     ReviewAlreadyExistException,
     ReviewANotFoundException,
     ReviewIdentificatorNotExistException,
+    ReviewANoScoreException,
 )
 from models.common import FilmReview
 from schemas.mixins import IdMixinSchema, UserIdFilmIdMixinSchema
@@ -35,6 +36,8 @@ class ReviewService:
     ) -> ReviewInDBFull:
         """Ревью фильму от пользователя в БД."""
         try:
+            if review_data.score is None:
+                raise ReviewANoScoreException
             new_review = await self.db_service.create(
                 db=db, obj_in=review_data
             )
