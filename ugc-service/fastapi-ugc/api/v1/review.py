@@ -20,23 +20,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/review",
-    response_model=ReviewInDBFull,
-    status_code=HTTPStatus.CREATED,
-    description="Оставить отзыв на фильм.",
-)
-async def create_review(
-    review_service: Annotated[ReviewService, Depends(get_review_service)],
-    db: Annotated[AsyncSession, Depends(get_session)],
-    review_data: ReviewInDBCreate,
-) -> ReviewInDBFull:
-    """Пользователь ставит лайк фильму."""
-    new_review = await review_service.create(db=db, review_data=review_data)
-    return new_review
-
-
-@router.post(
-    "/review/show",
+    "/show",
     response_model=ReviewInDBFull,
     status_code=HTTPStatus.OK,
     description="Получить отзыв пользователя на фильм.",
@@ -52,7 +36,7 @@ async def get_review(
 
 
 @router.post(
-    "/review/show_list",
+    "/show_list",
     response_model=list[ReviewInDBFull],
     status_code=HTTPStatus.OK,
     description="Получить отзывы по фильму/ отзывы по пользователю.",
@@ -81,8 +65,24 @@ async def get_review_list(
     return review_list
 
 
+@router.post(
+    "/",
+    response_model=ReviewInDBFull,
+    status_code=HTTPStatus.CREATED,
+    description="Оставить отзыв на фильм.",
+)
+async def create_review(
+    review_service: Annotated[ReviewService, Depends(get_review_service)],
+    db: Annotated[AsyncSession, Depends(get_session)],
+    review_data: ReviewInDBCreate,
+) -> ReviewInDBFull:
+    """Пользователь публикует отзыв к фильму."""
+    new_review = await review_service.create(db=db, review_data=review_data)
+    return new_review
+
+
 @router.patch(
-    "/review",
+    "/",
     response_model=ReviewInDBFull,
     description="Обновить отзыв.",
     status_code=HTTPStatus.OK,
@@ -98,7 +98,7 @@ async def update_review(
 
 
 @router.delete(
-    "/review",
+    "/",
     status_code=HTTPStatus.OK,
     description="Удалить отзыв пользователя на фильм.",
 )

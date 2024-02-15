@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "auth_sprint_1_tests"
+name = "ugc_sprint_1_tests"
 version = "0.1.0"
 description = ""
-authors = ["Борис Гельруд <agu-66@mail.ru>", "Холкин Сергей <>"]
+authors = ["Борис Гельруд <agu-66@mail.ru>", "Косянов Никита <>", "Холкин Сергей <>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -17,9 +17,6 @@ gunicorn = "^21.2.0"
 uvicorn = "^0.24.0.post1"
 orjson = "^3.9.10"
 asyncpg = "^0.29.0"
-python-jose = {extras = ["cryptography"], version = "^3.3.0"}
-bcrypt = "^4.1.2"
-
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.3.2"

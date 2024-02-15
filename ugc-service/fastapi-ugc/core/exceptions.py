@@ -39,3 +39,11 @@ class ReviewIdentificatorNotExistException(HTTPException):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Предоставьте ID фильма и/или ID пользователя.",
         )
+
+
+class ReviewANoScoreException(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Ошибки по полям: ['score: Field required'].",
+        )

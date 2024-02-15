@@ -66,23 +66,24 @@ app.add_middleware(
     session_cookie=settings.session_cookie,
 )
 
+if settings.enable_tracer:
 
-@app.middleware("http")
-async def before_request(
-    request: Request, call_next: Callable
-) -> _StreamingResponse | ORJSONResponse:
-    """Провереяет, имеется ли необходимый для трассировки заголовок."""
+    @app.middleware("http")
+    async def before_request(
+        request: Request, call_next: Callable
+    ) -> _StreamingResponse | ORJSONResponse:
+        """Провереяет, имеется ли необходимый для трассировки заголовок."""
 
-    if request.url.path.startswith(settings.prefix):
-        request_id = request.headers.get("X-Request-Id")
-        if not request_id:
-            return ORJSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"detail": "X-Request-Id is required"},
-            )
+        if request.url.path.startswith(settings.prefix):
+            request_id = request.headers.get("X-Request-Id")
+            if not request_id:
+                return ORJSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"detail": "X-Request-Id is required"},
+                )
 
-    response = await call_next(request)
-    return response
+        response = await call_next(request)
+        return response
 
 
 async def http422_error_handler(request, exc: RequestValidationError):
