@@ -72,9 +72,9 @@ class ReviewService:
             & (FilmReview.score < review_data.score_before + 1)
         )
         # Проверяем наличие user_id и film_id и добавляем условия
-        if review_data.user_id is not None:
+        if review_data.user_id:
             stmt = stmt.where(FilmReview.user_id == review_data.user_id)
-        if review_data.film_id is not None:
+        if review_data.film_id:
             stmt = stmt.where(FilmReview.film_id == review_data.film_id)
         # Добавляем пагинатор
         stmt = stmt.offset(offset).limit(page_size)
