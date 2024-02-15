@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from core.config import settings
 from db.postgres import Base
-from models.common import Like  # noqa
+from models.common import Like, FilmReview  # noqa
 
 
 # this is the Alembic Config object, which provides

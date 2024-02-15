@@ -149,3 +149,7 @@ etl/states.json
 temp_help.md
 
 .idea*
+
+#theory
+04_analytics_and_distributed_storage_content_files_docker-compose.yml
+/data
