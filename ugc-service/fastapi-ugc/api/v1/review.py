@@ -55,7 +55,7 @@ async def get_review(
     "/review/show_list",
     response_model=list[ReviewInDBFull],
     status_code=HTTPStatus.OK,
-    description="Получить отзывы по фильму/ отзывы пользователя на фильм.",
+    description="Получить отзывы по фильму/ отзывы по пользователю.",
 )
 async def get_review_list(
     review_service: Annotated[ReviewService, Depends(get_review_service)],
@@ -67,7 +67,7 @@ async def get_review_list(
     ),
 ) -> list[ReviewInDBFull]:
     """
-    Получить отзывы по фильму/ отзывы пользователя на фильм из БД.
+    Получить отзывы по фильму/ отзывы пользователя из БД с учетом оценок.
 
     :param page_number: Номер страницы (начиная с 1).
     :param page_size: Количество элементов на странице.
