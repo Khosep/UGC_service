@@ -45,7 +45,12 @@ class Settings(BaseSettings):
 
     session_cookie: str = "your_session_cookie"
 
-    enable_tracer: bool = Field(default=True)
+    enable_tracer: bool = Field(default=False)
+
+    # Настройка kafka
+    kafka_host: str = Field(default="127.0.0.1")
+    kafka_port: int = Field(default=9094)
+    kafka_topic_timestamp: str = "user_film_timestamp"
 
     @property
     def dsn(self) -> PostgresDsn:

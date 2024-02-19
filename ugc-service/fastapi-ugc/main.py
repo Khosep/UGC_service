@@ -12,11 +12,13 @@ from redis.asyncio import Redis
 from starlette.middleware.base import _StreamingResponse
 from starlette.middleware.sessions import SessionMiddleware
 
-from api.v1 import like, review
+from api.v1 import like, review, stats
 from core.config import settings
 from core.logger import logger
 from core.rate_limit import apply_rate_limit
-from db import redis
+from db import redis, kafka
+from aiokafka import AIOKafkaProducer
+
 
 
 @asynccontextmanager
@@ -29,11 +31,16 @@ async def lifespan(app: FastAPI):
         db=0,
         decode_responses=True,
     )
+    kafka.kafka_producer = AIOKafkaProducer(
+        bootstrap_servers=f"{settings.kafka_host}:{settings.kafka_port}"
+    )
+    await kafka.kafka_producer.start()
     logger.info("Приложение запущено")
     logger.info(f"Redis ping: {await redis.redis.ping()}")
     yield
     # Логика при завершении приложения.
     await redis.redis.close()
+    await kafka.kafka_producer.stop()
     logger.info("Приложение остановлено")
     # Добавим асинхронное закрытие обработчика файла
     for handler in logger.handlers:
@@ -58,6 +65,10 @@ app.include_router(
 
 app.include_router(
     review.router, prefix=settings.prefix + "/review", tags=["Отзывы"]
+)
+
+app.include_router(
+    stats.router, prefix=settings.prefix + "/stats", tags=["Статистика"]
 )
 
 app.add_middleware(

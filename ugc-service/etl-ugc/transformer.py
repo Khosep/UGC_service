@@ -1,0 +1,27 @@
+from datetime import datetime
+from typing import Generator
+
+from models import KafkaMessage, FilmTimestampMessage
+
+
+class Transformer:
+    """
+    Класс для трансформации сообщений из Kafka в формат,
+    позволяющий вставить данные в ClickHouse.
+    """
+
+    def transform_film_timestamp(
+            self, message: KafkaMessage
+    ) -> Generator:
+        """Преобразуем данные для временной метки по фильму."""
+
+
+        user_id, film_id = message.key.decode("utf-8").split("_")
+        film_timestamp_sec = int(message.value.decode("utf-8"))
+        data = FilmTimestampMessage(
+            user_id=user_id,
+            film_id=film_id,
+            film_ts=film_timestamp_sec,
+            event_time=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        )
+        yield data.model_dump()
