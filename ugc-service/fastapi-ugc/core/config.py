@@ -12,17 +12,6 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=ENV_PATH, env_file_encoding="utf-8", extra="ignore"
     )
-    # Настройки подключения к БД
-    scheme: str = "postgresql+asyncpg"
-    postgres_db: str = Field(default="ugc_database")
-    postgres_user: str = Field(default="app")
-    postgres_password: str = Field(default="123qwe")
-    postgres_host: str = Field(default="127.0.0.1")
-    postgres_port: int = Field(default=4432)
-    # Настройки Redis
-    ugc_redis_host: str = Field(default="127.0.0.1")
-    ugc_redis_port: int = Field(default=5379)
-    cache_expire_in_seconds: int = 60 * 5  # 5 минут
     # Настройки Fastapi
     ugc_fastapi_host: str = Field(default="127.0.0.1")
     ugc_fastapi_port: int = Field(default=7005)
@@ -36,10 +25,7 @@ class Settings(BaseSettings):
 
     # Настройки токенов
     access_token_secret_key: str = Field(default="ACCESS_TOKEN_SECRET_KEY")
-    refresh_token_secret_key: str = Field(default="REFRESH_TOKEN_SECRET_KEY")
     token_jwt_algorithm: str = "HS256"
-
-    standart_page_size: int = 10
 
     request_limit_per_minute: int = 20
 

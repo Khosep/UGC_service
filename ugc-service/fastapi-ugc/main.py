@@ -5,41 +5,30 @@ from http import HTTPStatus
 from typing import Callable
 
 import uvicorn
-from fastapi import FastAPI, Depends, Request, status
+from aiokafka import AIOKafkaProducer
+from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, ORJSONResponse
-from redis.asyncio import Redis
 from starlette.middleware.base import _StreamingResponse
 from starlette.middleware.sessions import SessionMiddleware
 
-from api.v1 import like, review, stats
+from api.v1 import stats
 from core.config import settings
 from core.logger import logger
-from core.rate_limit import apply_rate_limit
-from db import redis, kafka
-from aiokafka import AIOKafkaProducer
-
+from db import kafka
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Определение логики работы (запуска и остановки) приложения."""
     # Логика при запуске приложения.
-    redis.redis = Redis(
-        host=settings.ugc_redis_host,
-        port=settings.ugc_redis_port,
-        db=0,
-        decode_responses=True,
-    )
     kafka.kafka_producer = AIOKafkaProducer(
         bootstrap_servers=f"{settings.kafka_host}:{settings.kafka_port}"
     )
     await kafka.kafka_producer.start()
     logger.info("Приложение запущено")
-    logger.info(f"Redis ping: {await redis.redis.ping()}")
     yield
     # Логика при завершении приложения.
-    await redis.redis.close()
     await kafka.kafka_producer.stop()
     logger.info("Приложение остановлено")
     # Добавим асинхронное закрытие обработчика файла
@@ -56,15 +45,6 @@ app = FastAPI(
     docs_url=settings.openapi_docs_url,
     openapi_url=settings.openapi_url,
     default_response_class=ORJSONResponse,
-    dependencies=[Depends(apply_rate_limit)],
-)
-
-app.include_router(
-    like.router, prefix=settings.prefix + "/like", tags=["Лайки"]
-)
-
-app.include_router(
-    review.router, prefix=settings.prefix + "/review", tags=["Отзывы"]
 )
 
 app.include_router(
