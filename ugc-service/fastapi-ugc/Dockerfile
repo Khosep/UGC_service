@@ -8,8 +8,7 @@ ENV POETRY_VERSION 1.7.1
 
 WORKDIR /ugc-service
 
-RUN apt-get update && apt-get install -y postgresql-client
-RUN apt-get install -y redis-tools
+RUN apt-get update
 RUN pip install poetry==$POETRY_VERSION
 COPY poetry.lock pyproject.toml ./
 RUN poetry config virtualenvs.create false \
