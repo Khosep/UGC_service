@@ -4,6 +4,7 @@ version: '3.9'
 services:
   kafka-0:
     image: bitnami/kafka:3.5.2
+    container_name: kafka-0
     ports:
       - "9094:9092"
     environment:
@@ -17,12 +18,18 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-0:9092,EXTERNAL://localhost:9094
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
     volumes:
     - kafka_0_data:/bitnami/kafka
 
   kafka-1:
     image: bitnami/kafka:3.5.2
+    container_name: kafka-1
     ports:
       - "9095:9092"
     environment:
@@ -42,6 +49,7 @@ services:
 
   kafka-2:
     image: bitnami/kafka:3.5.2
+    container_name: kafka-2
     ports:
       - "9096:9092"
     environment:
@@ -85,6 +93,11 @@ services:
       - ./ugc-service/data/node1:/docker-entrypoint-initdb.d
     depends_on:
       - zookeeper
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   clickhouse-node2:
     image: clickhouse/clickhouse-server:23
@@ -138,10 +151,29 @@ services:
       - fastapi_ugc_log:/ugc-service/logs
     healthcheck:
       test: curl -s -f http://localhost:$UGC_FASTAPI_PORT/ugc/openapi || exit 1
-      interval: 10s
-      timeout: 1s
+      interval: 5s
+      timeout: 3s
       retries: 3
     restart: always
+    depends_on:
+      kafka-0:
+        condition: service_healthy
+
+
+  etl-ugc:
+    container_name: etl-ugc
+    build:
+      context: ./ugc-service/etl-ugc
+    env_file:
+      - .env
+    volumes:
+      - etl_ugc_log:/etl-ugc/logs
+    restart: always
+    depends_on:
+      kafka-0:
+        condition: service_healthy
+      clickhouse-node1:
+        condition: service_healthy
 
   nginx-ugc:
     container_name: nginx-ugc
@@ -160,6 +192,7 @@ services:
 
 
 volumes:
+  etl_ugc_log:
   fastapi_ugc_log:
   kafka_0_data:
   kafka_1_data:
