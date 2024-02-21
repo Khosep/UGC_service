@@ -136,7 +136,6 @@ services:
       - $UGC_FASTAPI_PORT
     volumes:
       - fastapi_ugc_log:/ugc-service/logs
-      - ./ugc-service/fastapi-ugc/:/ugc-service/:ro
 
     healthcheck:
       test: curl -s -f http://localhost:$UGC_FASTAPI_PORT/ugc/openapi || exit 1
