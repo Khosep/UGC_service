@@ -9,8 +9,7 @@ ENV POETRY_VERSION 1.7.1
 WORKDIR /tests
 
 RUN pip install poetry==$POETRY_VERSION
-COPY pyproject.toml ./
-# COPY poetry.lock pyproject.toml ./
+COPY poetry.lock pyproject.toml ./
 RUN poetry config virtualenvs.create false \
   && poetry install --no-root
 COPY . .
