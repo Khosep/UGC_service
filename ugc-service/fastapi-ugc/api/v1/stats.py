@@ -15,7 +15,7 @@ router = APIRouter()
 
 @router.post(
     "/",
-    status_code=HTTPStatus.OK,
+    status_code=HTTPStatus.CREATED,
     description="Отправить временную метку по фильму.",
 )
 async def send_film_timestamp(
