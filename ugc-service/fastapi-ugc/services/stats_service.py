@@ -1,32 +1,33 @@
 from functools import lru_cache
 from typing import Type
-from uuid import UUID
 
 from aiokafka import AIOKafkaProducer
 
 from schemas.stats_schema import FilmTimestamp
+from schemas.token_schema import Token
 from services.broker_service import Producer, KafkaProducer
 
 
 class StatsService:
-
     def __init__(self, producer_service: Type[Producer]):
         self.producer_service = producer_service()
 
     async def send_film_timestamp_to_broker(
-            self,
-            producer: AIOKafkaProducer,
-            topic: str,
-            user_id: UUID,
-            film_data: FilmTimestamp
+        self,
+        producer: AIOKafkaProducer,
+        topic: str,
+        film_data: FilmTimestamp,
+        token_data: Token | None = None,
     ):
+        user_id = "anonimous"
+        data = film_data.model_dump()
+        if token_data:
+            data.update(token_data.model_dump())
+            user_id = token_data.user_id
         key = self._str_to_bytes(f"{str(user_id)}_{str(film_data.film_id)}")
-        value = self._str_to_bytes(str(film_data.film_timestamp_sec))
+        value = self._str_to_bytes(str(data))
         result = await self.producer_service.send(
-            producer=producer,
-            topic=topic,
-            key=key,
-            value=value
+            producer=producer, topic=topic, key=key, value=value
         )
         return result
 

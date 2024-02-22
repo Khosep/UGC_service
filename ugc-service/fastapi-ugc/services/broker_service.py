@@ -14,13 +14,8 @@ class Producer(ABC):
 
 
 class KafkaProducer(Producer):
-
     async def send(
-            self,
-            producer: AIOKafkaProducer,
-            topic: str,
-            key: bytes,
-            value: bytes
+        self, producer: AIOKafkaProducer, topic: str, key: bytes, value: bytes
     ) -> RecordMetadata:
         result = await producer.send_and_wait(
             topic=topic, key=key, value=value
