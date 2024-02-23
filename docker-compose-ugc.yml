@@ -149,6 +149,7 @@ services:
       - $UGC_FASTAPI_PORT
     volumes:
       - fastapi_ugc_log:/ugc-service/logs
+
     healthcheck:
       test: curl -s -f http://localhost:$UGC_FASTAPI_PORT/ugc/openapi || exit 1
       interval: 5s
@@ -189,6 +190,18 @@ services:
       fastapi-ugc:
         condition: service_healthy
     restart: always
+
+  ugc-tests:
+    env_file:
+      - .env
+    container_name: ugc-tests
+    build:
+      context: ./ugc-service/tests-ugc
+    image: tests_ugc_img
+    depends_on:
+       fastapi-ugc:
+        condition: service_healthy
+    command: poetry run pytest
 
 
 volumes:

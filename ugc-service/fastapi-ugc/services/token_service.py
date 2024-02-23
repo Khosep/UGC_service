@@ -4,17 +4,16 @@ from jose import jwt, JWTError, ExpiredSignatureError
 from pydantic import ValidationError
 
 from core.config import settings
-from core.exceptions import CredentialsException, TokenExpiredException, ValidationException
+from core.exceptions import (
+    CredentialsException,
+    TokenExpiredException,
+    ValidationException,
+)
+from schemas.token_schema import Token
 
 
 class TokenService:
-
-    def get_user_id(self, token: str):
-        """Получаем токен из декодированного токена."""
-        payload = self.get_payload(token)
-        return payload.get("user_id")
-
-    def get_payload(self, token: str) -> dict:
+    def get_token_data(self, token: str) -> Token:
         """Декодируем токен."""
         try:
             payload = jwt.decode(
@@ -25,11 +24,26 @@ class TokenService:
             user_id = payload.get("user_id")
             if user_id is None:
                 raise CredentialsException
-            return payload
+            token_data = Token(
+                user_id=payload.get("user_id"),
+                username=payload.get("username"),
+                roles=payload.get("roles"),
+                email=payload.get("email"),
+                first_name=payload.get("first_name"),
+                last_name=payload.get("last_name"),
+            )
+            return token_data
         except ExpiredSignatureError as exc:
             raise TokenExpiredException from exc
         except (JWTError, ValidationError) as exc:
             raise ValidationException("access_token") from exc
+
+    def extract_token(self, authorization: str | None = None) -> str | None:
+        if authorization is None:
+            return None
+        if not authorization.startswith("Bearer "):
+            raise CredentialsException
+        return authorization.split(" ")[1]
 
 
 @lru_cache()
