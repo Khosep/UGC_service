@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "etl-ugc"
+version = "0.1.0"
+description = "ETL first UGC-service sprint"
+authors = ["Борис Гельруд <agu-66@mail.ru>", "Никита Косянов <>", "Сергей Холкин <khose007@yandex.ru>"]
+license = "open"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+clickhouse-driver = "0.2.6"
+kafka-python = "2.0.2"
+pydantic = "2.6.1"
+pydantic-settings = "2.1.0"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.3.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
