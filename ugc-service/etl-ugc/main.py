@@ -1,5 +1,6 @@
 from clickhouse_loader import ClickHouseLoader
 from core.config import settings
+from core.logger import logger
 from kafka_extractor import KafkaExtractor
 from transformer import Transformer
 
@@ -25,4 +26,5 @@ if __name__ == '__main__':
     transformer = Transformer()
     loader = ClickHouseLoader()
 
+    logger.info("Staring etl process")
     etl_process(extractor, transformer, loader)
