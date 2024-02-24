@@ -10,15 +10,15 @@ https://github.com/Izrekatel/Auth_sprint_2
 - Холкин Сергей (https://github.com/Khosep/)
 
 ## Описание проекта:
-"Сервис авторизации онлайн-кинотеатра" взаимодействует с API кинотеатра и
-административной панелью Django. Настроена трассировка запросов в API сервиса
-авторизации, добавлена возможность регистрации и авторизации через соц. сети.
-Установлен лимит запросов к сервису.
-Проект организован в docker-compose.
+"Сервис UGC (User Generated Content)" позволяет сохранять для дальнейшей
+ обработки пользовательские данные. Для этого на Factapi реализован эндпоинт,
+ при обращении на который происходит сохранение данных в брокер сообщиний на
+ базе кластера Kaffka, после чего компонент ETL извлекает данные из Kaffka и
+ пачками сохраняет их в хранилище на базе кластера Clickhouse. Дополнительно к
+ сервису написаны тесты на базе Pytest.
 
 ## Стек:
 - Python
-- Redis
 - Fastapi
 - Git
 - Docker
@@ -29,13 +29,9 @@ https://github.com/Izrekatel/Auth_sprint_2
 - Pytest
 - aiohttp
 - nginx
-- sqlalchemy
-- alembic
-- jaeger
-- elasticsearch
 - swagger
-- postgres
-- redis
+- kaffka
+- clickhouse
 
 ### 1. Запуск основного проекта в контейнерах Docker
 
@@ -45,62 +41,24 @@ https://github.com/Izrekatel/Auth_sprint_2
 
 #### 3. Поднимаем сеть контейнеров:
 ```bash
-docker-compose -f docker-compose-movies.yml -f docker-compose-django.yml -f docker-compose-auth.yml up -d
+docker-compose -f docker-compose-ugc.yml up -d
 ```
-```
-При первом запуске postgres-movies надо зайти в контейер и выполнить команду
-psql -U app -d movies_database -f /docker-entrypoint-initdb.d/create_schema.ddl
-```
-
 #### 4. Просмотр основного проекта
 
 ```
-Документация сервиса авторизациидоступна по адресу:
-http://localhost:90/auth/openapi#/
+Документация сервиса доступна по адресу:
+http://localhost:60/ugc/openapi
 
 Также можно ее скачать в виде json:
-http://localhost:90/auth/openapi.json
+http://localhost:60/ugc/openapi.json
 
 ```
-
-```
-Документация сервиса movies по адресу:
-http://localhost:70/api/openapi#/
-
-Также можно ее скачать в виде json:
-http://localhost:70/api/openapi.json
-
-```
-
-```
-Административная панель DJANGO:
-http://localhost/admin/
-
-```
-
-
-### 2. Запуск тестов в контейнерах Docker
-
-#### 1. Создать .env файл из env.example
-
-#### 2. Запустить Docker
-
-#### 3. Поднимаем контейнеры:
-```
-Запуск тестов AUTH-сервиса
-docker compose -f docker-compose-auth-tests.yml up -d
-```
-```
-Запуск тестов MOVIES-сервиса
-docker compose -f docker-compose-movies-test.yml up -d
-```
-
-#### 4. Результат:
+#### 5. Результат:
 ```
 После прохождения тестов результат можно посмотреть к логах контейнера тестов.
 ```
 
-### 3. Установка для локальной разработки
+### 2. Установка для локальной разработки
 
 1. Установите Poetry
 
