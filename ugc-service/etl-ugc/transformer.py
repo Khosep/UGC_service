@@ -15,13 +15,9 @@ class Transformer:
     ) -> Generator:
         """Преобразуем данные для временной метки по фильму."""
 
-
-        user_id, film_id = message.key.decode("utf-8").split("_")
-        film_timestamp_sec = int(message.value.decode("utf-8"))
+        dict_message = eval(message.value.decode("utf-8").replace("UUID", ""))
         data = FilmTimestampMessage(
-            user_id=user_id,
-            film_id=film_id,
-            film_ts=film_timestamp_sec,
+            **dict_message,
             event_time=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         )
         yield data.model_dump()
