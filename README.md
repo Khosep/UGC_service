@@ -2,7 +2,7 @@
 # Сервис контента генерируемого пользователем в онлайн-кинотеатре
 
 # Адрес репозитория:
-https://github.com/Izrekatel/Auth_sprint_2
+https://github.com/Izrekatel/ugc_sprint_1
 
 # Авторы проекта:
 - Гельруд Борис (https://github.com/Izrekatel/)
