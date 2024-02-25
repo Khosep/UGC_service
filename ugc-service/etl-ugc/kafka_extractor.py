@@ -35,7 +35,6 @@ class KafkaExtractor(Extractor):
 
     def read(self) -> Generator[KafkaMessage, None, None]:
         """Читаем сообщение из Kafka."""
-
         for message in self.consumer:
             logger.debug(f"Прочитано сообщение ({message})")
             yield KafkaMessage(key=message.key, value=message.value)
