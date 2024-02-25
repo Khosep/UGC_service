@@ -1,3 +1,5 @@
+import ast
+
 from datetime import datetime
 from typing import Generator
 
@@ -15,7 +17,7 @@ class Transformer:
     ) -> Generator:
         """Преобразуем данные для временной метки по фильму."""
 
-        dict_message = eval(message.value.decode("utf-8").replace("UUID", ""))
+        dict_message = ast.literal_eval(message.value.decode("utf-8").replace("UUID", ""))
         data = FilmTimestampMessage(
             **dict_message,
             event_time=datetime.now().strftime('%Y-%m-%d %H:%M:%S')

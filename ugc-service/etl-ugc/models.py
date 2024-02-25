@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List
 from pydantic import BaseModel
 
 
@@ -13,7 +12,7 @@ class FilmTimestampMessage(BaseModel):
     film_id: str
     film_timestamp_sec: int
     username: str | None = ''
-    roles: List[str] | None = []
+    roles: list[str] | None = []
     email: str | None = ''
     first_name: str | None = ''
     last_name: str | None = ''
