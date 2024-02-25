@@ -3,6 +3,7 @@ from typing import Any, AsyncGenerator, Callable, Coroutine
 
 import pytest
 from aiohttp import ClientSession
+from clickhouse_driver import Client
 
 from functional.settings import test_settings
 
@@ -57,3 +58,8 @@ def make_post_request(
             }
 
     return inner
+
+
+@pytest.fixture(scope="session")
+def clickhouse_client():
+    return Client(host=test_settings.clickhouse_host)

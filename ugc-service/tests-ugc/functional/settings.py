@@ -17,6 +17,10 @@ class TestSettings(BaseSettings):
     #  endpoint paths
     common_endpoint: str = "/ugc/v1/stats"
 
+    clickhouse_host: str = Field(default='127.0.0.1')
+
+    clickhouse_table: str = 'shard.film_views'
+
     headers_common: dict = {
         "Content-Type": "application/json",
         "X-Request-Id": "1",

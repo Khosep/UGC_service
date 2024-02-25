@@ -1,3 +1,5 @@
+import uuid
+
 from http import HTTPStatus
 from typing import Callable
 
@@ -25,3 +27,9 @@ async def test_create_record_without_token(create_film_stats_record: Callable):
     """Проверка создания новой записи без токена."""
     response = await create_film_stats_record(film_data=film_data)
     assert response["status"] == HTTPStatus.CREATED
+
+
+async def test_etl(clickhouse_client):
+    query = f"SELECT * FROM {test_settings.clickhouse_table} WHERE film_id = '{film_data['film_id']}'"
+    result = clickhouse_client.execute(query)
+    assert result[0][1] == uuid.UUID(film_data['film_id'])
