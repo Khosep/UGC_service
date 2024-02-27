@@ -18,4 +18,4 @@ class ClickHouseLoader:
         self.client.execute(INSERT_BUTCH, batch)
         extractor.commit()
         logger.info("Add %d items to ClickHouse", len(batch))
-        logger.info("Summnay = %d", self.client.execute(COUNT_ROWS)[0][0])
+        logger.info("Summary = %d", self.client.execute(COUNT_ROWS)[0][0])
