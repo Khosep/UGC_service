@@ -12,14 +12,14 @@ class Transformer:
     позволяющий вставить данные в ClickHouse.
     """
 
-    def transform_film_timestamp(
-            self, message: KafkaMessage
-    ) -> Generator:
+    def transform_film_timestamp(self, message: KafkaMessage) -> Generator:
         """Преобразуем данные для временной метки по фильму."""
 
-        dict_message = ast.literal_eval(message.value.decode("utf-8").replace("UUID", ""))
+        dict_message = ast.literal_eval(
+            message.value.decode("utf-8").replace("UUID", "")
+        )
         data = FilmTimestampMessage(
             **dict_message,
-            event_time=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            event_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         )
         yield data.model_dump()

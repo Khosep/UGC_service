@@ -26,11 +26,11 @@ async def lifespan(app: FastAPI):
         bootstrap_servers=f"{settings.kafka_host}:{settings.kafka_port}"
     )
     await kafka.kafka_producer.start()
-    logger.info("Приложение запущено")
+    logger.info("App started")
     yield
     # Логика при завершении приложения.
     await kafka.kafka_producer.stop()
-    logger.info("Приложение остановлено")
+    logger.info("App stopped")
     # Добавим асинхронное закрытие обработчика файла
     for handler in logger.handlers:
         if isinstance(handler, logging.FileHandler):

@@ -24,19 +24,20 @@ class Extractor(ABC):
 
 class KafkaExtractor(Extractor):
     """Класс для чтения сообщений из Kafka."""
+
     def __init__(self):
         self.consumer = KafkaConsumer(
             settings.kafka_topic_timestamp,
             bootstrap_servers=[f"{settings.kafka_host}:{settings.kafka_port}"],
             group_id="film_stats",
             enable_auto_commit=False,
-            auto_offset_reset='earliest'
+            auto_offset_reset="earliest",
         )
 
     def read(self) -> Generator[KafkaMessage, None, None]:
         """Читаем сообщение из Kafka."""
         for message in self.consumer:
-            logger.debug(f"Прочитано сообщение ({message})")
+            logger.debug("Read message (%d)", message)
             yield KafkaMessage(key=message.key, value=message.value)
 
     def commit(self):
