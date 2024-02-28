@@ -6,3 +6,11 @@ Total time taken for input: 427.5465805530548 seconds
 Read started at 2024-02-28 10:44:58.267124
 Read finished at 2024-02-28 10:44:58.341100
 Total read time 0.07397603988647461 seconds
+Result ClickHouse with 20 threads with tread size 500000 insert by 500 rows
+Total input size: 10000000 rows.
+Input started at 2024-02-28 11:14:05.579560
+Input finished at 2024-02-28 11:21:40.204109
+Total time taken for input: 454.62454891204834 seconds
+Read started at 2024-02-28 11:21:40.205112
+Read finished at 2024-02-28 11:21:40.287773
+Total read time 0.08266019821166992 seconds
