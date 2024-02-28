@@ -8,9 +8,9 @@ import vertica_python
 
 lock = Lock()
 
-NUM_THREADS = 20  # Количество потоков
-BUTCH_SIZE = 500  # Количество строк для одномоментной вставки
-THREAD_SIZE = 500000  # общее количество строк в потоке
+NUM_THREADS = 10  # Количество потоков
+BUTCH_SIZE = 1000  # Количество строк для одномоментной вставки
+THREAD_SIZE = 1000000  # общее количество строк в потоке
 
 connection_info = {
     "host": "127.0.0.1",
@@ -65,8 +65,8 @@ def generate_random_data(butch_size: int):
     return data_to_insert
 
 
-def insert_data(i, connection, data_to_insert, size):
-    cursor = connection.cursor()
+def insert_data(i, conn, data_to_insert, size):
+    cursor = conn.cursor()
     cursor.executemany(
         """INSERT INTO views (user_id, film_id, film_timestamp_sec, event_time)
         VALUES (%s, %s, %s, %s);""",
@@ -80,26 +80,14 @@ def insert_bulk_data(i, butch_size, tread_size):
     print(f"Thread {i} - Insertion started\n")
     try:
         print(f"Thread {i} - Generated data for insertion\n")
-        with create_connection() as connection:
-            create_table(connection)  # Создание таблицы для каждого соединения
-            cursor = connection.cursor()
+        with create_connection() as conn:
             while tread_size >= butch_size:
                 tread_size -= butch_size
                 data_to_insert = generate_random_data(butch_size)
-                cursor.executemany(
-                    """INSERT INTO views (user_id, film_id, film_timestamp_sec, event_time)
-                    VALUES (%s, %s, %s, %s);""",
-                    data_to_insert,
-                )
-                print(f"Thread {i} - Inserted {butch_size} rows\n")
+                insert_data(i, conn, data_to_insert, butch_size)
             if tread_size > 0:
                 data_to_insert = generate_random_data(tread_size)
-                cursor.executemany(
-                    """INSERT INTO views (user_id, film_id, film_timestamp_sec, event_time)
-                    VALUES (%s, %s, %s, %s);""",
-                    data_to_insert,
-                )
-                print(f"Thread {i} - Inserted {tread_size} rows\n")
+                insert_data(i, conn, data_to_insert, tread_size)
     except Exception as e:
         print(f"Thread {i} - Error occurred: {str(e)}\n")
         with open("error_vertica.log", "a") as file:
@@ -108,6 +96,7 @@ def insert_bulk_data(i, butch_size, tread_size):
     finally:
         end_time = time.time()
         print(f"Thread {i} - Completed in {end_time - start_time} seconds\n")
+        conn.close()
 
 
 if __name__ == "__main__":
@@ -132,7 +121,8 @@ if __name__ == "__main__":
         )
         with open("vertica.log", "a") as file:
             file.write(
-                f"Result vertica with {NUM_THREADS} threads with tread size {THREAD_SIZE} insert by {BUTCH_SIZE} rows\n"
+                f"Result vertica with {NUM_THREADS} threads with tread size "
+                f"{THREAD_SIZE} insert by {BUTCH_SIZE} rows\n"
             )
             file.write(f"Total input size: {NUM_THREADS*THREAD_SIZE} rows.\n")
             file.write(
@@ -142,7 +132,8 @@ if __name__ == "__main__":
                 f"Input finished at {datetime.fromtimestamp(end_input_time)}\n"
             )
             file.write(
-                f"Total time taken for input: {end_input_time - start_input_time} seconds\n"
+                f"Total time taken for input: "
+                f"{end_input_time - start_input_time} seconds\n"
             )
         start_read_time = time.time()
         output_rows(connection)
