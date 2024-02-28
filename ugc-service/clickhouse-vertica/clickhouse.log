@@ -1,0 +1,8 @@
+Result ClickHouse with 10 threads with tread size 1000000 insert by 1000 rows
+Total input size: 10000000 rows.
+Input started at 2024-02-28 10:37:50.718948
+Input finished at 2024-02-28 10:44:58.265528
+Total time taken for input: 427.5465805530548 seconds
+Read started at 2024-02-28 10:44:58.267124
+Read finished at 2024-02-28 10:44:58.341100
+Total read time 0.07397603988647461 seconds
