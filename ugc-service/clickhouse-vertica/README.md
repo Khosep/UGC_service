@@ -21,7 +21,7 @@ https://github.com/Izrekatel/ugc_sprint_1
     - clickhouse 0,074 сек
     - vertica 0,865 сек.
 
-При таких исходных данный выбор в пользу хранилища clickhouse.
+При таких исходных данных выбор в пользу хранилища clickhouse.
 
 ## Стек:
 - Python
