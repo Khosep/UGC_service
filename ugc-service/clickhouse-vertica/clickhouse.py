@@ -52,8 +52,8 @@ def generate_random_data(butch_size: int):
 
 def insert_data(i, client, data_to_insert, size):
     client.execute(
-        """INSERT INTO views (id, user_id, film_id, film_timestamp_sec, event_time)
-        VALUES""",
+        """INSERT INTO views (id, user_id, film_id, film_timestamp_sec,
+        event_time) VALUES""",
         data_to_insert,
     )
     print(f"Thread {i} - Inserted {size} rows\n")
@@ -65,7 +65,6 @@ def insert_bulk_data(i, butch_size, tread_size):
     try:
         print(f"Thread {i} - Generated data for insertion\n")
         client = create_client()
-        create_table(client)  # Создание таблицы
         while tread_size >= butch_size:
             tread_size -= butch_size
             data_to_insert = generate_random_data(butch_size)
@@ -85,10 +84,7 @@ def insert_bulk_data(i, butch_size, tread_size):
 
 if __name__ == "__main__":
     threads = []
-    create_table(
-        create_client()
-    )  # Создание таблицы перед началом работы потоков
-
+    create_table(create_client())
     start_input_time = time.time()
     print("Start input\n")
     for i in range(NUM_THREADS):
@@ -106,7 +102,8 @@ if __name__ == "__main__":
 
     with open("clickhouse.log", "a") as file:
         file.write(
-            f"Result ClickHouse with {NUM_THREADS} threads with tread size {THREAD_SIZE} insert by {BUTCH_SIZE} rows\n"
+            f"Result ClickHouse with {NUM_THREADS} threads with tread size "
+            f"{THREAD_SIZE} insert by {BUTCH_SIZE} rows\n"
         )
         file.write(f"Total input size: {NUM_THREADS * THREAD_SIZE} rows.\n")
         file.write(
@@ -116,7 +113,8 @@ if __name__ == "__main__":
             f"Input finished at {datetime.fromtimestamp(end_input_time)}\n"
         )
         file.write(
-            f"Total time taken for input: {end_input_time - start_input_time} seconds\n"
+            f"Total time taken for input: {end_input_time - start_input_time} "
+            f"seconds\n"
         )
 
     start_read_time = time.time()

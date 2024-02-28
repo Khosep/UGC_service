@@ -6,3 +6,11 @@ Total time taken for input: 558.300822019577 seconds
 Read started at 2024-02-28 10:55:34.213755
 Read finished at 2024-02-28 10:55:35.078535
 Total read time 0.8647797107696533 seconds
+Result vertica with 20 threads with tread size 500000 insert by 500 rows
+Total input size: 10000000 rows.
+Input started at 2024-02-28 11:21:59.066643
+Input finished at 2024-02-28 11:31:12.032579
+Total time taken for input: 552.9659359455109 seconds
+Read started at 2024-02-28 11:31:12.033741
+Read finished at 2024-02-28 11:31:13.153209
+Total read time 1.1194672584533691 seconds
